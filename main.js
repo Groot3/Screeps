@@ -189,7 +189,7 @@ var towers = _.filter(Game.structures, (s) => s.structureType == STRUCTURE_TOWER
             {memory: {role: 'builder'}}, {directions:TOP});
     }
     
-        if(upgraders.length < 1 && wheelbarrows.length > 1) {
+        if(upgraders.length < 1 && wheelbarrows.length > 2) {
         var newName = 'Upgrader' + Game.time;
         console.log('Spawning new upgrader: ' + newName);
         Game.spawns['Delta'].spawnCreep([WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,CARRY,CARRY,MOVE,MOVE,MOVE,], newName,

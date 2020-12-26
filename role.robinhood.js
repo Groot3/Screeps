@@ -10,12 +10,8 @@ var roleRobinhood = {
             }
             if (hostiles.length > 0) {
                 console.log("robinhood detecting intruders, attempting to attack")
-                if (creep.rangedAttack(hostiles) != OK) {
-                    var closestEnemyCreep = creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS)
-                    if (creep.moveTo(closestEnemyCreep) != OK) {
-                        var BestRoute = creep.pos.findPathTo(hostiles)
-                            creep.moveTo(BestRoute)
-                    }
+                if (creep.rangedAttack(hostiles[0]) != OK) {
+                    creep.moveTo(hostiles[0])
                 }
             }
             if (hostiles == false) { // no enemy creeps, enemy buildings?? 
