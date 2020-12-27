@@ -10,6 +10,9 @@ var roleRobinhood = require('role.robinhood')
 const roleScout = require('role.scout')
 const radar = require('radar')
 const roleBrute = require('role.brute')
+const spawnClaimer = require('spawn.claim')
+const rolehandler = require('role.handler')
+
 module.exports.loop = function () {
 
 radar() // Scans for enemy hostiles and enemy hostile structures
@@ -39,9 +42,6 @@ var towers = _.filter(Game.structures, (s) => s.structureType == STRUCTURE_TOWER
     if ((PriorityWalls) && (tower.energy > 800) && (!EnemyLoc)){
         tower.repair(PriorityWalls)
     }
-//    if ((DamagedStruc) && (tower.energy > 900)){
-//        tower.repair(DamagedStruc)
-//    }
 };
 
 
@@ -84,10 +84,6 @@ var towers = _.filter(Game.structures, (s) => s.structureType == STRUCTURE_TOWER
     var remoteHaulerE13N4 = _.filter(Game.creeps, (creep) => creep.memory.targetLoc == 'E13N4' && creep.memory.role == 'remotehauler')
 
     var remoteHaulerE12N3 = _.filter(Game.creeps, (creep) => creep.memory.targetLoc == 'E12N3' && creep.memory.role == 'remotehauler')
-    
-    var remoteClaimerE13N4 = _.filter(Game.creeps, (creep) => creep.memory.targetLoc == 'E13N4' && creep.memory.role == 'remoteclaimer')
-
-    var remoteClaimerE12N5 = _.filter(Game.creeps, (creep) => creep.memory.targetLoc == 'E12N5' && creep.memory.role == 'remoteclaimer')
 
     var robinhood = _.filter(Game.creeps, (creep) => creep.memory.role == 'robinhood')
     
@@ -97,61 +93,9 @@ var towers = _.filter(Game.structures, (s) => s.structureType == STRUCTURE_TOWER
     
     let brute = _.filter(Game.creeps, (creep) => creep.memory.role == 'brute')
     
-    for(var name in Game.creeps) {
-        var creep = Game.creeps[name];
-        if(creep.memory.role == 'harvester') {
-            roleHarvester.run(creep);
-        }
-        if(creep.memory.role == 'upgrader') {
-            roleUpgrader.run(creep);
-        }
-        if(creep.memory.role == 'builder') {
-            roleBuilder.run(creep);
-        }
-        if(creep.memory.role == 'wheelbarrow') {
-            roleWheelbarrow.run(creep);
-        }
-        if(creep.memory.role == 'repairer') {
-            roleRepairer.run(creep);
-        }
-        if(creep.memory.targetLoc == 'E12N5' && creep.memory.role == 'remoteharvester') {
-            roleRemoteHarvester.run(creep,"E12N5");
-        }
-        if(creep.memory.targetLoc == 'E13N4' && creep.memory.role == 'remoteharvester') {
-            roleRemoteHarvester.run(creep,"E13N4");
-        }
-        if(creep.memory.targetLoc == 'E12N3' && creep.memory.role == 'remoteharvester') {
-            roleRemoteHarvester.run(creep,"E12N3");
-        }
-        if(creep.memory.targetLoc == 'E12N5' && creep.memory.role == 'remotehauler') {
-            roleRemoteHauler.run(creep,'E12N5','E12N4')
-        }
-        if(creep.memory.targetLoc == 'E13N4' && creep.memory.role == 'remotehauler') {
-            roleRemoteHauler.run(creep,'E13N4','E12N4')
-        }
-        if(creep.memory.targetLoc == 'E12N3' && creep.memory.role == 'remotehauler') {
-            roleRemoteHauler.run(creep,'E12N3','E12N4')
-        }
-        if(creep.memory.targetLoc == 'E13N4' && creep.memory.role == 'remoteclaimer') {
-            roleRemoteClaimer.run(creep,'E13N4')
-        }
-        if(creep.memory.targetLoc == 'E12N5' && creep.memory.role == 'remoteclaimer') {
-            roleRemoteClaimer.run(creep,'E12N5')
-        }
-        if(creep.memory.role == 'robinhood') {
-            roleRobinhood.run(creep)
-        }
-        if(creep.memory.role == 'scout' &&  creep.memory.targetLoc == 'E13N4' ) {
-            roleScout.run(creep,'E13N4')
-        }
-        if(creep.memory.role == 'scouto' &&  creep.memory.targetLoc == 'E15N3' ) {
-            roleScout.run(creep,'E15N3')
-        }
-        if(creep.memory.role == 'brute') {
-            roleBrute.run(creep, 'E15N3')
-        }
-    }
-
+    rolehandler() // The ugliest thing you've ever seen. Thrown into a function to work with refactoring spawn code
+    // TODO: massive cleanup, make a real role handler?
+    
     if(harvesters.length < 2) {
         if(otherHarv.length < 1) {
             console.log('Spawning OtherHarvester')
@@ -161,7 +105,7 @@ var towers = _.filter(Game.structures, (s) => s.structureType == STRUCTURE_TOWER
                 {memory: {role: 'harvester', secondary:true}})
             }
         if(wheelbarrows.length == 0){
-            //fail clause
+            //fail clause, helps revive starved colonies in case that spawning logic breaks.
         var newName ='Wheelbarrow' + Game.time
         console.log('Spawning new wheelbarrow: ' + newName);
         Game.spawns['Delta'].spawnCreep([MOVE,CARRY,CARRY,CARRY], newName,
@@ -240,18 +184,12 @@ var towers = _.filter(Game.structures, (s) => s.structureType == STRUCTURE_TOWER
             Game.spawns['Delta'].spawnCreep([CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE], newName, 
                 {memory: {role:'remotehauler', targetLoc:'E12N3', homeLoc:'E12N4'}})
         }
-        if(remoteClaimerE13N4.length < 0 && wheelbarrows.length > 1 && inSightHostiles.length == 0) {
-            var newName = 'Remote Claimer E13 N4' + Game.time
-            console.log('Spawning new ' + newName)
-            Game.spawns['Delta'].spawnCreep([MOVE,CLAIM], newName,
-                {memory: {role:'remoteclaimer', targetLoc:'E13N4'}})
-        }
-        if(remoteClaimerE12N5.length < 1 && wheelbarrows.length > 1 && inSightHostiles.length == 0) {
-            var newName = 'Remote Claimer E12 N5' + Game.time
-            console.log('Spawning new ' + newName)
-            Game.spawns['Delta'].spawnCreep([MOVE,CLAIM], newName,
-                {memory: {role:'remoteclaimer', targetLoc:'E12N5'}})
-        }
+        
+
+        //spawnClaimer("E13N4")
+        spawnClaimer("E12N3")
+        spawnClaimer("E12N5")
+        
         if(robinhood.length < 1 && inSightHostiles.length > 0) {
             var newName = 'Robinhood ' + Game.time
             console.log('Spawning new ' + newName)

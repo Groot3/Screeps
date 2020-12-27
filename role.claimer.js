@@ -1,8 +1,10 @@
 var roleRemoteClaimer = {
 
     /** @param {Creep} creep **/
-    run: function(creep, goToRoom) {
-        if (creep.room.name != goToRoom) {
+    run: function(creep) {
+        goToRoom = creep.memory.targetLoc
+        if (creep.room.name != creep.memory.targetLoc) {
+            console.log(goToRoom)
             var exitDirection = creep.room.findExitTo(goToRoom)
             var nearestExit = creep.pos.findClosestByPath(exitDirection)
             creep.moveTo(nearestExit)
