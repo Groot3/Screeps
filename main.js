@@ -12,9 +12,11 @@ const radar = require('radar')
 const roleBrute = require('role.brute')
 const spawnClaimer = require('spawn.claim')
 const rolehandler = require('role.handler')
+const clearMemory = require('clearmemory')
 
 module.exports.loop = function () {
 
+clearMemory() // Clears dead creeps from memory
 radar() // Scans for enemy hostiles and enemy hostile structures
 
 var towers = _.filter(Game.structures, (s) => s.structureType == STRUCTURE_TOWER);
@@ -27,32 +29,20 @@ var towers = _.filter(Game.structures, (s) => s.structureType == STRUCTURE_TOWER
             Game.rooms[name].controller.activateSafeMode();
             console.log("Oh Shit Sum1 Hur!");
         }
-    
-    //
-    var EnemyLoc = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
     var PriorityWalls = tower.pos.findClosestByRange(FIND_STRUCTURES, {
         filter: (s) => s.hits < s.hitsMax && s.hits < 200000 && s.structureType != STRUCTURE_WALL// && s.structureType != STRUCTURE_ROAD
     });
     var DamagedStruc = tower.pos.findClosestByRange(FIND_STRUCTURES, {
     filter: (s) => s.hits < s.hitsMax && s.structureType != STRUCTURE_WALL //&& s.structureType != STRUCTURE_ROAD
     });
-    if(EnemyLoc) {
-        tower.attack(EnemyLoc)
+    if(inSightHostiles.length > 0) {
+        tower.attack(inSightHostiles[0])
     }
-    if ((PriorityWalls) && (tower.energy > 800) && (!EnemyLoc)){
+    if ((PriorityWalls) && (tower.energy > 800) && (!inSightHostiles)){
         tower.repair(PriorityWalls)
     }
 };
-
-
-  for(var name in Memory.creeps) {
-        if(!Game.creeps[name]) {
-            delete Memory.creeps[name];
-            console.log('Clearing non-existing creep memory:', name);
-        }
-    }
     
-
     var harvesters = _.filter(Game.creeps, (creep) => creep.memory.role == 'harvester');
     console.log('Harvesters: ' + harvesters.length);
 
