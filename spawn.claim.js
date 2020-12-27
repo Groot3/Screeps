@@ -1,5 +1,3 @@
-const roleRemoteClaimer = require('role.claimer')
-
 function spawnClaimer (targetLoc) {
     const claimer = _.filter(Game.creeps, (creep) => creep.memory.targetLoc == targetLoc && creep.memory.role == 'claimer')
     if(claimer.length < 1) {

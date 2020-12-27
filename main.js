@@ -1,18 +1,9 @@
-var roleHarvester = require('role.harvester');
-var roleUpgrader = require('role.upgrader');
-var roleBuilder = require('role.builder');
-var roleWheelbarrow = require('role.wheelbarrow');
-var roleRepairer = require('role.repairer');
-var roleRemoteHarvester = require('role.remoteharvester')
-var roleRemoteHauler = require('role.remotehauler')
-var roleRemoteClaimer = require('role.claimer')
-var roleRobinhood = require('role.robinhood')
-const roleScout = require('role.scout')
 const radar = require('radar')
-const roleBrute = require('role.brute')
 const spawnClaimer = require('spawn.claim')
 const rolehandler = require('role.handler')
-const clearMemory = require('clearmemory')
+const clearMemory = require('clearmemory');
+const spawnRemoteHarvester = require('./spawn.remoteharvester');
+const spawnRemoteHauler = require('./spawn.remotehauler');
 
 module.exports.loop = function () {
 
@@ -62,18 +53,6 @@ var towers = _.filter(Game.structures, (s) => s.structureType == STRUCTURE_TOWER
     
     var minerOne = _.filter(Game.creeps, (creep) => creep.memory.minerone == true);
     console.log("Minerone: " + minerOne.length)
-    
-    var remoteHarvesterE12N5 = _.filter(Game.creeps, (creep) => creep.memory.targetLoc == 'E12N5' && creep.memory.role == 'remoteharvester');
-
-    var remoteHarvesterE13N4 = _.filter(Game.creeps, (creep) => creep.memory.targetLoc == 'E13N4' && creep.memory.role == 'remoteharvester');
-    
-    var remoteHarvesterE12N3 = _.filter(Game.creeps, (creep) => creep.memory.targetLoc == 'E12N3' && creep.memory.role == 'remoteharvester');
-    
-    var remoteHaulerE12N5 = _.filter(Game.creeps, (creep) => creep.memory.targetLoc == 'E12N5' && creep.memory.role == 'remotehauler')
-    
-    var remoteHaulerE13N4 = _.filter(Game.creeps, (creep) => creep.memory.targetLoc == 'E13N4' && creep.memory.role == 'remotehauler')
-
-    var remoteHaulerE12N3 = _.filter(Game.creeps, (creep) => creep.memory.targetLoc == 'E12N3' && creep.memory.role == 'remotehauler')
 
     var robinhood = _.filter(Game.creeps, (creep) => creep.memory.role == 'robinhood')
     
@@ -136,50 +115,19 @@ var towers = _.filter(Game.structures, (s) => s.structureType == STRUCTURE_TOWER
             Game.spawns['Delta'].spawnCreep([WORK,WORK,WORK,WORK,WORK,WORK,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE], newName,
                 {memory: {role:'repairer'}})
         }
-        
-        if(remoteHarvesterE12N5.length < 1 && wheelbarrows.length > 1 && inSightHostiles.length == 0) {
-            var newName = 'Remote Harvester ' + Game.time;
-            console.log('Spawning new remoteharvester: ' + newName);
-            Game.spawns['Delta'].spawnCreep([WORK,WORK,WORK,WORK,WORK,WORK,MOVE,MOVE,MOVE,MOVE], newName,
-                {memory: {role:'remoteharvester', targetLoc:'E12N5'}})
-        }
-        
-        if(remoteHarvesterE13N4.length < 0 && wheelbarrows.length > 1 && inSightHostiles.length == 0) {
-            var newName = 'Remote Harvester ' + Game.time;
-            console.log('Spawning new remoteharvester: ' + newName);
-            Game.spawns['Delta'].spawnCreep([WORK,WORK,WORK,WORK,WORK,WORK,MOVE,MOVE,MOVE,MOVE], newName,
-                {memory: {role:'remoteharvester', targetLoc:'E13N4'}})
-        }
-        if(remoteHarvesterE12N3.length < 0 && wheelbarrows.length > 1 && inSightHostiles.length == 0) {
-            var newName = 'Remote Harvester ' + Game.time;
-            console.log('Spawning new remoteharvester: ' + newName);
-            Game.spawns['Delta'].spawnCreep([WORK,WORK,WORK,WORK,WORK,WORK,MOVE,MOVE,MOVE,MOVE], newName,
-                {memory: {role:'remoteharvester', targetLoc:'E12N3'}})
-        }
-        if(remoteHaulerE12N5.length < 1 && wheelbarrows.length > 1 && inSightHostiles.length == 0) {
-            var newName = 'Remote Hauler E12 N5 ' + Game.time;
-            console.log("Spawning new" + newName)
-            Game.spawns['Delta'].spawnCreep([CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE], newName, 
-                {memory: {role:'remotehauler', targetLoc:'E12N5', homeLoc:'E12N4'}})
-        }
-        if(remoteHaulerE13N4.length < 0 && wheelbarrows.length > 1 && inSightHostiles.length == 0) {
-            var newName = 'Remote Hauler E13 N4 ' + Game.time;
-            console.log("Spawning new" + newName)
-            Game.spawns['Delta'].spawnCreep([CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE], newName, 
-                {memory: {role:'remotehauler', targetLoc:'E13N4', homeLoc:'E12N4'}})
-        }
-        if(remoteHaulerE12N3.length < 0 && wheelbarrows.length > 1 && inSightHostiles.length == 0) {
-            var newName = 'Remote Hauler E12 N3 ' + Game.time;
-            console.log("Spawning new" + newName)
-            Game.spawns['Delta'].spawnCreep([CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE], newName, 
-                {memory: {role:'remotehauler', targetLoc:'E12N3', homeLoc:'E12N4'}})
-        }
-        
+        //TODO: Package together; or automate remote-ops. Requires more brainpower. Coming back to this.
 
         //spawnClaimer("E13N4")
         spawnClaimer("E12N3")
         spawnClaimer("E12N5")
-        
+        //spawnRemoteHarvester("E13N4")
+        spawnRemoteHarvester("E12N3")
+        spawnRemoteHarvester("E12N5")
+        //spawnRemoteHauler("E13N4")
+        spawnRemoteHauler("E12N3")
+        spawnRemoteHauler("E12N5")
+
+
         if(robinhood.length < 1 && inSightHostiles.length > 0) {
             var newName = 'Robinhood ' + Game.time
             console.log('Spawning new ' + newName)

@@ -39,7 +39,6 @@ var roleRemoteHauler = {
 	       if (creep.pickup(droppedres[0]) == ERR_NOT_IN_RANGE) {
 	           creep.moveTo(droppedres[0], {reusePath: 50})
 	       }
-	       //var fullcontainers =
 	   }
 	}
 }
