@@ -56,7 +56,7 @@ var towers = _.filter(Game.structures, (s) => s.structureType == STRUCTURE_TOWER
 
     var robinhood = _.filter(Game.creeps, (creep) => creep.memory.role == 'robinhood')
     
-    let scout = _.filter(Game.creeps, (creep) => creep.memory.targetLoc == 'E13N4' && creep.memory.role == 'scout')
+    let scout = _.filter(Game.creeps, (creep) => creep.memory.role == 'scout')
     
     let scouto = _.filter(Game.creeps, (creep) => creep.memory.targetLoc == 'E15N3' && creep.memory.role == 'scouto')
     
@@ -95,7 +95,7 @@ var towers = _.filter(Game.structures, (s) => s.structureType == STRUCTURE_TOWER
             {memory: {role: 'wheelbarrow'}})
     }
 
-    if(builders.length < 0) {
+    if(builders.length < 1) {
         var newName = 'Builder' + Game.time;
         console.log('Spawning new builder: ' + newName);
         Game.spawns['Delta'].spawnCreep([WORK,WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE], newName,
@@ -115,6 +115,7 @@ var towers = _.filter(Game.structures, (s) => s.structureType == STRUCTURE_TOWER
             Game.spawns['Delta'].spawnCreep([WORK,WORK,WORK,WORK,WORK,WORK,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE], newName,
                 {memory: {role:'repairer'}})
         }
+        
         //TODO: Package together; or automate remote-ops. Requires more brainpower. Coming back to this.
 
         //spawnClaimer("E13N4")
@@ -138,7 +139,7 @@ var towers = _.filter(Game.structures, (s) => s.structureType == STRUCTURE_TOWER
             let newName = 'Scout' + Game.time
             console.log('Spawning new' + newName)
             Game.spawns['Delta'].spawnCreep([MOVE], newName,
-                {memory: {role:'scout', targetLoc:'E13N4'}})
+                {memory: {role:'scout', targetLoc:'E6N7'}})
         }
         if(scouto.length < 0) {
             let newName = 'Scout' + Game.time
@@ -149,16 +150,7 @@ var towers = _.filter(Game.structures, (s) => s.structureType == STRUCTURE_TOWER
         if(brute.length < 0) {
             let newName = 'Brute' + Game.time
             console.log('Spawning new ' + newName)
-            Game.spawns['Delta'].spawnCreep([MOVE,TOUGH,TOUGH,MOVE,TOUGH,TOUGH,MOVE,TOUGH,TOUGH,MOVE,TOUGH,TOUGH,MOVE,TOUGH,TOUGH,MOVE,ATTACK,TOUGH,MOVE,TOUGH,MOVE,TOUGH,TOUGH,MOVE,TOUGH,TOUGH], newName,
+            Game.spawns['Spawn2'].spawnCreep([MOVE,TOUGH,TOUGH,MOVE,TOUGH,TOUGH,MOVE,TOUGH,TOUGH,MOVE,TOUGH,TOUGH,MOVE,TOUGH,TOUGH,MOVE,ATTACK,TOUGH,MOVE,TOUGH,MOVE,TOUGH,TOUGH,MOVE,TOUGH,TOUGH], newName,
                 {memory: {role:'brute'}})
         }
-    if(Game.spawns['Delta'].spawning) {
-        var spawningCreep = Game.creeps[Game.spawns['Delta'].spawning.name];
-        Game.spawns['Delta'].room.visual.text(
-            '🛠️' + spawningCreep.memory.role,
-            Game.spawns['Delta'].pos.x + 1,
-            Game.spawns['Delta'].pos.y,
-            {align: 'left', opacity: 0.8});
-    }
-
 }
